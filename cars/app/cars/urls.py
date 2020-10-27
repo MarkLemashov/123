@@ -3,7 +3,8 @@ from rest_framework import routers
 from cars.app.cars import views
 
 router = routers.DefaultRouter()
-router.register(r'', views.CarsViewSet)
+router.register(r'cars', views.CarsViewSet)
+router.register(r'customers', views.CustomersViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
