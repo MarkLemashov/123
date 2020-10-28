@@ -5,12 +5,14 @@ from django.db.models.signals import pre_save
 class Customer(models.Model):
     name = models.CharField(max_length=60)
     money = models.IntegerField(default=0)
-    item_to_purchase = None
 
     def buy_car(self, car_id):
         car = Car.objects.get(id=car_id)
-        self.item_to_purchase = car
-        self.save()
+        if self.money >= car.price:
+            self.money -= car.price
+            self.save()
+            car.customer = self
+            car.save()
 
     def earn(self, money_earned):
         self.money += money_earned
@@ -29,15 +31,15 @@ class Car(models.Model):
         return self.make
 
 
-def customer_pre_save_validation(sender, instance, *args, **kwargs):
-    if instance.item_to_purchase is not None:
-        if instance.money >= instance.item_to_purchase.price:
-            instance.money -= instance.item_to_purchase.price
-            instance.item_to_purchase.customer = instance
-            instance.item_to_purchase.save()
-            instance.item_to_purchase = None
-        else:
-            raise Exception('Customer does not have enough money.')
+# def customer_pre_save_validation(sender, instance, **kwargs):
+#     if instance.item_to_purchase is not None:
+#         if instance.money >= instance.item_to_purchase.price:
+#             instance.money -= instance.item_to_purchase.price
+#             instance.item_to_purchase.customer = instance
+#             instance.item_to_purchase.save()
+#             instance.item_to_purchase = None
+#         else:
+#             raise Exception('Customer does not have enough money.')
 
 
-pre_save.connect(customer_pre_save_validation, sender=Customer)
+# pre_save.connect(customer_pre_save_validation, sender=Customer)
