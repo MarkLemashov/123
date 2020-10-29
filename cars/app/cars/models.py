@@ -13,6 +13,8 @@ class Customer(models.Model):
             self.save()
             car.customer = self
             car.save()
+        else:
+            raise RuntimeError('not enough money on the account')
 
     def earn(self, money_earned):
         self.money += money_earned
